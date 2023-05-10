@@ -6,7 +6,7 @@ import { AppRoutes } from "./routes/appRoutes";
 import { UsersRoutes } from "./routes/userRoutes";
 import { GameRoutes } from "./routes/gameRoutes";
 import { AdminRoutes } from "./routes/adminRoutes";
-import { createServer } from "node:http";
+import { createServer } from "http";
 dotenv.config();
 
 const app: Application = express();
