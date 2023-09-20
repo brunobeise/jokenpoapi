@@ -10,7 +10,7 @@ import { createServer } from "http";
 import { sendEmail } from "./services/nodemailer";
 import AppRepository from "./repository/AppRepository";
 import { MarketplaceRoutes } from "./routes/marketplaceRoutes";
-import { AuctionRoutes } from "./routes/AuctionRoutes";
+import { AuctionRoutes } from "./routes/auctionRoutes";
 dotenv.config();
 
 const app: Application = express();

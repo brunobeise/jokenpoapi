@@ -42,5 +42,11 @@
     "@types/socket.io-client": "^3.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
-  }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "index.js"
+    }
+  ]
 }
