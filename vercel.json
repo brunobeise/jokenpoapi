@@ -1,4 +1,19 @@
 {
   "version": 2,
-  "routes": [{ "src": "/(.*)", "dest": "index.js" }]
+  "name": "jokenpo-api",
+  "builds": [
+    {
+      "src": "src/server.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/server.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
