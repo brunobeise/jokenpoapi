@@ -14,6 +14,19 @@ export class UserController {
 
     const userRepository = new UserRepository();
     const { username, password, country, avatar } = req.body;
+
+    if (!username || !password || !country || !avatar) return res.status(400).json({
+      success: false,
+      message: "Invalid parameters"
+    })
+
+    const usernames = await userRepository.getAllUsernames()
+
+    if (usernames.some(u => u === username)) return res.status(400).json({
+      success: false,
+      message: "Username already exists"
+    })
+
     const result = await userRepository.createUser(
       username,
       password,

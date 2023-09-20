@@ -14,6 +14,16 @@ export default class UserRepository {
     return await this.userRepository.find();
   }
 
+  async getAllUsernames() {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.username')
+      .getMany();
+
+    const usernames = users.map(user => user.username);
+    return usernames;
+  }
+
   async getUserById(id: string) {
     return await this.userRepository.findOne({
       where: { id: id },
