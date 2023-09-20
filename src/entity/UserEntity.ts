@@ -55,7 +55,7 @@ export class User {
   @Column({ default: 1000 })
   rating!: number;
 
-  @Column({ default: 50 })
+  @Column({ default: 0 })
   balance?: number;
 
   @Column({ nullable: true })
