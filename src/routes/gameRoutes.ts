@@ -5,8 +5,7 @@ const router = express.Router();
 
 export const GameRoutes = () => {
   const gamecontroller = new GameController();
-  router.post("/findplay", gamecontroller.getOnlinePlay);
-  router.post("/computergame", authMiddleware, gamecontroller.computerGame);
+  router.post("/computer", authMiddleware, gamecontroller.computerGame);
 
   return router;
 };

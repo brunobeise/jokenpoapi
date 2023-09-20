@@ -1,5 +1,5 @@
 import { Play, Result } from "../../types";
-import UserRepository from "../repository/User.repository";
+import UserRepository from "../repository/UserRepository";
 import { newRatingCalculator } from "./rating";
 
 export function checkResult(play1: Play, play2: Play): Result {
@@ -18,26 +18,4 @@ export function checkResult(play1: Play, play2: Play): Result {
   return "loss";
 }
 
-export async function onlineGame(
-  play1: Play,
-  play2: Play,
-  username: string,
-  betValue: number,
-  r1: number,
-  r2: number
-) {
-  const userRepository = new UserRepository();
-  const result = checkResult(play1, play2);
-  const userId = await userRepository.getUserByUsername(username);
-  let newBalance: number | undefined;
-  if (result === "loss") {
-    newBalance = await userRepository.DepositJokens(userId!.id, betValue * -1);
-    const newRating = newRatingCalculator(r1, r2, false);
-    userRepository.editRating(userId!.id, newRating);
-  } else if (result === "win") {
-    newBalance = await userRepository.DepositJokens(userId!.id, betValue);
-    const newRating = newRatingCalculator(r1, r2, true);
-    userRepository.editRating(userId!.id, newRating);
-  }
-  return { result, newBalance };
-}
+

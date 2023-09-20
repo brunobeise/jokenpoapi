@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import SkinRepository from "../repository/Skin.Repository";
+import SkinRepository from "../repository/SkinRepository";
 
 export class SkinController {
   async createSkin(req: Request, res: Response) {

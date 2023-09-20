@@ -15,7 +15,8 @@ export const AppRoutes = () => {
     appController.checkTransaction
   );
   router.post("/getavailableskins", skinController.findAvailableSkins);
-  router.post("/top10", appController.getTop10ByRating);
+  router.get("/top10", appController.getTop10ByRating);
+  router.post("/sendemail", authMiddleware, appController.sendEmail);
 
   return router;
 };

@@ -1,9 +1,11 @@
-import { User } from "../entity/User.entity";
+import { User } from "../entity/UserEntity";
 import { database } from "../database";
 import bcrypt from "bcrypt";
 import { AvatarData } from "../../types";
-import { WithdrawRequest } from "../entity/WithdrawRequest.entity";
-import SkinRepository from "./Skin.Repository";
+import { WithdrawRequest } from "../entity/WithdrawRequestEntity";
+import SkinRepository from "./SkinRepository";
+import { MoreThan } from "typeorm";
+import MarketplaceRepository from "./MarketplaceRepository";
 
 export default class UserRepository {
   private userRepository = database.getRepository(User);
@@ -49,6 +51,7 @@ export default class UserRepository {
       const users = await this.getUsers();
       if (users.some((u) => u.username === username)) {
         return {
+          succes: false,
           error: "user already registered",
         };
       }
@@ -59,16 +62,16 @@ export default class UserRepository {
       user.username = username;
       user.country = country;
       user.avatar = avatar;
-      this.userRepository.save(user);
+      await this.userRepository.save(user);
 
       return {
-        result: "ok",
-        data: user,
+        success: true,
+        data: await user.toDetail(),
       };
     } catch (error) {
       return {
-        result: "error",
-        data: error,
+        success: false,
+        error: "Server Error",
       };
     }
   }
@@ -100,30 +103,38 @@ export default class UserRepository {
     this.userRepository.save(user);
   }
 
-  async addMatch(userId: string, balanceAdjust: number): Promise<void> {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (user) {
-      if (!user.balance) user.balance = balanceAdjust;
-      if (user.balance) user.balance += balanceAdjust;
-      if (!user.plays) user.plays = 1;
-      if (user.plays) user.plays += 1;
-      await this.userRepository.save(user);
-    } else {
-      throw new Error("User not found");
-    }
+  async addMatch(userId: string, balanceAdjust: number) {
+    const user = await this.getUserById(userId);
+
+    if (!user) return
+
+
+    user.balance = Number(user.balance ?? 0)
+    user.matches = Number(user.matches ?? 0)
+
+    user.balance += balanceAdjust
+    user.matches += 1
+
+
+    const userAtt = await this.userRepository.save(user)
+
+    return userAtt.balance;
   }
 
+
   async DepositJokens(userId: string, jokens: number) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (user) {
-      if (!user.balance) user.balance = jokens;
-      if (user.balance) user.balance += jokens;
-      await this.userRepository.save(user);
-      if (!user.balance) return jokens;
-      if (user.balance) return user.balance + jokens;
-    } else {
-      throw new Error("User not found");
-    }
+
+    const user = await this.getUserById(userId);
+    if (!user) return
+    console.log(user.username + '+ ' + jokens + 'jokens');
+
+    user.balance = Number(user.balance ?? 0);
+    if (user.balance + jokens < 0) return
+    user.balance += jokens;
+
+
+    await this.userRepository.save(user);
+    return user.balance;
   }
 
   async createWithdrawRequest(userId: string, value: string, wallet: string) {
@@ -143,12 +154,9 @@ export default class UserRepository {
     return user?.skins;
   }
 
-  async addUserSkin(userId: string, skinName: string) {
+  async addSkinToUser(userId: string, skinName: string) {
     const skinRepository = new SkinRepository();
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ["skins"],
-    });
+    const user = await this.getUserById(userId)
     const skin = await skinRepository.findSkinByName(skinName);
 
     if (!user || !skin) {
@@ -160,9 +168,22 @@ export default class UserRepository {
     }
 
     user.skins.push(skin);
-    console.log(user);
     await this.userRepository.save(user);
     return true;
+  }
+
+  async removeSkin(userId: string, skinName: string) {
+    const skinRepository = new SkinRepository()
+    const user = await this.getUserById(userId)
+    const skin = await skinRepository.findSkinByName(skinName)
+
+    if (!user || !skin) return
+
+    user.skins = user.skins.filter(s => s.name !== skinName);
+
+    await this.userRepository.save(user);
+
+    return skin
   }
 
   async listUsersBySkinName(name: string) {
@@ -179,6 +200,46 @@ export default class UserRepository {
     const user = await this.getUserById(id);
     if (!user) return;
     user.selectedSkin = skinName;
+
+
+    await this.userRepository.save(user);
+    return
+  }
+
+  async getUserPosition(userId: string): Promise<number> {
+
+    // Obtenha o rating do usuário
+    const user = await this.getUserById(userId);
+    if (!user) {
+      return 0
+    }
+
+    // Conte quantos usuários têm um rating superior
+    const count = await this.userRepository.count({
+      where: {
+        rating: MoreThan(user.rating)
+      }
+    });
+
+    // A posição é determinada pelo número de usuários com um rating superior mais um
+    return count + 1;
+  }
+
+  async confirmUser(userId: string, email: string, wallet: string) {
+    const user = await this.getUserById(userId);
+    if (!user) return false
+    this.DepositJokens(user.id, 5)
+    const emails = await this.userRepository
+      .createQueryBuilder("user")
+      .select("user.email")
+      .getMany();
+    if (emails.some((e) => e.email === email)) {
+      return false;
+    }
+
+    user.email = email;
+    user.wallet = wallet;
     this.userRepository.save(user);
+    return true
   }
 }

@@ -7,6 +7,10 @@ import { UsersRoutes } from "./routes/userRoutes";
 import { GameRoutes } from "./routes/gameRoutes";
 import { AdminRoutes } from "./routes/adminRoutes";
 import { createServer } from "http";
+import { sendEmail } from "./services/nodemailer";
+import AppRepository from "./repository/AppRepository";
+import { MarketplaceRoutes } from "./routes/marketplaceRoutes";
+import { AuctionRoutes } from "./routes/AuctionRoutes";
 dotenv.config();
 
 const app: Application = express();
@@ -18,10 +22,16 @@ app.use("/user", UsersRoutes());
 app.use("/game", GameRoutes());
 app.use("/app", AppRoutes());
 app.use("/adm", AdminRoutes());
+app.use("/marketplace", MarketplaceRoutes());
+app.use("/auction", AuctionRoutes())
+
 
 export async function bootstrapServer() {
   await database.initialize();
+
   return createServer(app);
+
+
 }
 
 /* database.initialize().then(() => {

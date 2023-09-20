@@ -1,17 +1,22 @@
 import { DataSource } from "typeorm";
-import { User } from "./entity/User.entity";
-import { WithdrawRequest } from "./entity/WithdrawRequest.entity";
-import { Skin } from "./entity/Skin.entity";
+import { User } from "./entity/UserEntity";
+import { WithdrawRequest } from "./entity/WithdrawRequestEntity";
+import { Skin } from "./entity/SkinEntity";
+import { Game } from "./entity/GameEntity";
+import { Marketplace } from "./entity/MarketplaceEntity";
+import { Auction } from "./entity/AuctionEntity";
+import { Bid } from "./entity/BidEntity";
 
 export const database = new DataSource({
   type: "postgres",
-  host: "motty.db.elephantsql.com",
+  host: "ep-restless-lab-43830056-pooler.us-east-1.postgres.vercel-storage.com",
   port: 5432,
-  username: "ziglxmxd",
-  password: "NHR5Qetv7bxmT58TEM4kcMP44n6s7nWd",
-  database: "ziglxmxd",
+  username: "default",
+  password: "D4LbtiQP9ahK",
+  database: "verceldb",
   synchronize: true,
-  entities: [User, WithdrawRequest, Skin],
+  entities: [User, WithdrawRequest, Skin, Game, Marketplace, Auction, Bid],
   migrations: [],
+  ssl: true,
   migrationsTableName: "custom_migration_table",
 });

@@ -1,4 +1,4 @@
-const Web3 = require("web3");
+import Web3 from "web3";
 
 // Cria a instância do Web3 utilizando o provider local do Ethereum
 const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545/");
@@ -13,18 +13,9 @@ export async function monitoringByHash(txHash: string) {
   console.log("monitorando..." + txHash);
 
   const receipt = await web3.eth.getTransactionReceipt(txHash);
+  console.log(receipt.status);
 
   if (!receipt) return "Aguardando...";
 
-  const status = receipt.status;
-
-  if (receipt.status === false) {
-    return "Aguardando...";
-  }
-
-  if (status === true) {
-    return receipt;
-  } else {
-    return `A transação ${txHash} falhou.`;
-  }
+  return receipt.status
 }

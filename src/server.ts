@@ -1,8 +1,9 @@
 import { Server } from "socket.io";
 import { bootstrapServer } from ".";
 import { initializeSocket } from "./services/socket/socket";
+import AppRepository from "./repository/AppRepository";
 
-bootstrapServer().then((httpServer) => {
+bootstrapServer().then(async (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -10,4 +11,5 @@ bootstrapServer().then((httpServer) => {
   });
   initializeSocket(io);
   httpServer.listen(3001, () => console.log(`rodando`));
+  console.log(await new AppRepository().getBotBalance());
 });

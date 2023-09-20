@@ -3,6 +3,11 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export function generateToken(id: string, username: string) {
+  if (!id || !username) {
+    console.log('not found ' + id, username);
+    return
+  }
+
   const token = jwt.sign(
     { id: id, username: username },
     process.env.JWTSECRET!

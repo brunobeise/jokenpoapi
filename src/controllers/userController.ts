@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
 import { database } from "../database";
-import { User } from "../entity/User.entity";
+import { User } from "../entity/UserEntity";
 import bcrypt from "bcrypt";
 import { generateToken, validateToken } from "../utils/crypto";
 import { AvatarData } from "../../types";
-import UserRepository from "../repository/User.repository";
-import SkinRepository from "../repository/Skin.Repository";
+import UserRepository from "../repository/UserRepository";
+import SkinRepository from "../repository/SkinRepository";
 
 export class UserController {
+
+
   async createUser(req: Request, res: Response) {
-    console.log(req.body);
+
     const userRepository = new UserRepository();
     const { username, password, country, avatar } = req.body;
     const result = await userRepository.createUser(
@@ -18,22 +20,37 @@ export class UserController {
       country,
       avatar
     );
-    res.json(result);
+    if (!result.data) return res.status(401).json({
+      success: false,
+      message: result.error
+    })
+
+    console.log(result.data);
+
+    const token = generateToken(result.data.id, result.data.username);
+
+
+    res.status(201).json({
+      success: true,
+      data: result,
+      token: token
+    });
   }
 
   async login(req: Request, res: Response) {
     const { username, password } = req.body;
     const userRepository = database.getRepository(User);
+    console.log(username, password);
 
     const user = await userRepository.findOneBy({ username: username });
     if (!user) {
-      res.json({ success: false, user: {} });
+      res.status(401).json({ success: false, message: "Invalid username or password. Please try again." });
       return;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      res.json({ succes: false, user: {} });
+      res.status(401).json({ success: false, message: "Invalid username or password. Please try again." });
       return;
     }
 
@@ -41,7 +58,7 @@ export class UserController {
 
     res.json({
       success: true,
-      user: user,
+      data: await user.toDetail(),
       token: token,
     });
   }
@@ -98,8 +115,8 @@ export class UserController {
     const skinRepository = new SkinRepository();
     const skin = await skinRepository.findSkinByName(req.body.name);
 
-    if (!skin || skin.quantity === 0) {
-      res.json({ result: false });
+    if (!skin) {
+      res.status(400).json({ success: false });
       return;
     }
 
@@ -108,27 +125,39 @@ export class UserController {
     if (!user) return;
 
     if (user.balance! < skin.price) {
-      res.json({ result: false });
+      res.status(400).json({ success: false });
       return;
     }
 
-    const result = await userRepository.addUserSkin(
+    const result = await userRepository.addSkinToUser(
       req.body.id,
       req.body.skinName
     );
 
     if (!result) {
-      res.json({ result: result });
+      res.status(400).json({ success: false });
       return;
     }
 
-    skinRepository.adjustQuantity(req.body.name, -1);
     userRepository.DepositJokens(user.id, skin.price * -1);
-    res.json({ result: true });
+    res.status(200).json({ success: true });
   }
 
   async changeselectedSkin(req: Request, res: Response) {
     const userRepository = new UserRepository();
-    userRepository.changeSelectedSkin(req.body.id, req.body.skinName);
+    await userRepository.changeSelectedSkin(req.body.id, req.body.skinName);
+    res.sendStatus(201)
+  }
+
+  async confirmUser(req: Request, res: Response) {
+    const { email, wallet } = req.body
+    if (!email || !wallet) return res.sendStatus(400)
+    const token = req.headers.authorization!;
+    const user = validateToken(token);
+    if (!user) return res.sendStatus(400)
+    const userRepository = new UserRepository();
+    const confirm = await userRepository.confirmUser(user.id, email, wallet)
+    if (confirm) return res.sendStatus(200)
+    else return res.sendStatus(400).json({ success: true, message: "email already registered" })
   }
 }

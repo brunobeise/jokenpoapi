@@ -16,6 +16,6 @@ export const UsersRoutes = () => {
   router.post("/editavatar", authMiddleware, userController.editUserAvatar);
   router.post("/purchaseskin", userController.addSkinToUser);
   router.post("/changeskin", userController.changeselectedSkin);
-
+  router.post("/confirm", authMiddleware, userController.confirmUser)
   return router;
 };

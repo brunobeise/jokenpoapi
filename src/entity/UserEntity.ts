@@ -6,8 +6,10 @@ import {
   ManyToMany,
   JoinTable,
 } from "typeorm";
-import { WithdrawRequest } from "./WithdrawRequest.entity";
-import { Skin } from "./Skin.entity";
+import { WithdrawRequest } from "./WithdrawRequestEntity";
+import { Skin } from "./SkinEntity";
+import UserRepository from "../repository/UserRepository";
+import { Marketplace } from "./MarketplaceEntity";
 
 @Entity()
 export class User {
@@ -16,6 +18,12 @@ export class User {
 
   @Column({ unique: true })
   username!: string;
+
+  @Column({ unique: true, nullable: true })
+  email!: string;
+
+  @Column({ nullable: true })
+  wallet!: string;
 
   @Column()
   country!: string;
@@ -42,7 +50,7 @@ export class User {
   wins?: number;
 
   @Column({ default: 0 })
-  plays?: number;
+  matches?: number;
 
   @Column({ default: 1000 })
   rating!: number;
@@ -59,4 +67,25 @@ export class User {
   @ManyToMany(() => Skin)
   @JoinTable({ name: "users_skins" })
   skins!: Skin[];
+
+  @OneToMany(() => Marketplace, marketplace => marketplace.user)
+  marketplaceListings!: Marketplace[];
+
+  async toDetail() {
+    return {
+      id: this.id,
+      username: this.username,
+      email: this.email,
+      wallet: this.wallet,
+      avatar: this.avatar,
+      balance: this.balance,
+      country: this.country,
+      wins: this.wins,
+      matches: this.matches,
+      rating: this.rating,
+      position: await new UserRepository().getUserPosition(this.id),
+      skins: this.skins,
+      selectedSkin: this.selectedSkin
+    }
+  }
 }
