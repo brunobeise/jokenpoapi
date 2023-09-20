@@ -4,12 +4,16 @@ import { initializeSocket } from "./services/socket/socket";
 import AppRepository from "./repository/AppRepository";
 
 bootstrapServer().then(async (httpServer) => {
+  const port = process.env.PORT || 3001;
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: process.env.CORS_ORIGIN || "*",
     },
   });
+
   initializeSocket(io);
-  httpServer.listen(3001, () => console.log(`rodando`));
+
+  httpServer.listen(port, () => console.log(`rodando na porta ${port}`));
+
   console.log(await new AppRepository().getBotBalance());
 });
