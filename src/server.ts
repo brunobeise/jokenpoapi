@@ -3,11 +3,12 @@ import { bootstrapServer } from ".";
 import { initializeSocket } from "./services/socket/socket";
 import AppRepository from "./repository/AppRepository";
 
+
 bootstrapServer().then(async (httpServer) => {
   const port = process.env.PORT || 3001;
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CORS_ORIGIN || "*",
+      origin: "*",
     },
   });
 
