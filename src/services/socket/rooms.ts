@@ -13,7 +13,6 @@ export function createRoom(player1: QueuedPlayer, player2: QueuedPlayer, initial
 
 
     const roomID = uuid();
-    console.log("crete room " + roomID + "betvalue" + initialBetValue);
     player1.socket.join(roomID);
     player2.socket.join(roomID);
     let betValue = initialBetValue;

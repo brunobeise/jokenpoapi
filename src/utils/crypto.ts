@@ -12,7 +12,6 @@ export function generateToken(id: string, username: string) {
     { id: id, username: username },
     process.env.JWTSECRET!
   );
-  console.log(token);
 
   return token;
 }

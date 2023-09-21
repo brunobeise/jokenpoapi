@@ -40,7 +40,7 @@ export class AppController {
     while (result === "Aguardando..." && attempts < 10) {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       result = await monitoringByHash(req.params.txHash);
-      console.log(result);
+
       attempts++;
     }
 

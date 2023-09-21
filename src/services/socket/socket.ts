@@ -24,7 +24,6 @@ export const waitingQueues: { [key: number]: QueuedPlayer[] } = {
 
 export const initializeSocket = (io: Server) => {
   io.on("connection", (socket: Socket) => {
-    console.log(`Novo jogador conectado: ${socket.id}`);
     leaveQueueAtConnection(socket)
     connecteds.push(socket.id)
     socket.on("readyToPlay", (params: { id: string, betValue: number }) => readyToPlay(params.id, params.betValue, socket, io))

@@ -38,8 +38,6 @@ export class UserController {
       message: result.error
     })
 
-    console.log(result.data);
-
     const token = generateToken(result.data.id, result.data.username);
 
 

@@ -93,7 +93,7 @@ export default class MarketplaceRepository {
         const userMarket = marketplaceEntry.user as unknown as User
 
         if (user.skins.some((existingSkin: Skin) => existingSkin.id === skin.id)) {
-            console.log('ja tem');
+
             return
 
         }
