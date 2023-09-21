@@ -24,6 +24,16 @@ export default class UserRepository {
     return usernames;
   }
 
+  async getAllEmails() {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.email')
+      .getMany();
+
+    const usernames = users.map(user => user.email);
+    return usernames;
+  }
+
   async getUserById(id: string) {
     return await this.userRepository.findOne({
       where: { id: id },

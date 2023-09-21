@@ -170,7 +170,10 @@ export class UserController {
     if (!user) return res.sendStatus(400)
     const userRepository = new UserRepository();
     const confirm = await userRepository.confirmUser(user.id, email, wallet)
-    if (confirm) return res.sendStatus(200)
-    else return res.sendStatus(400).json({ success: true, message: "email already registered" })
+    if (confirm) {
+      const newBalance = await userRepository.DepositJokens(user.id, 5)
+      return res.status(200).json({ newBalance })
+    }
+    else return res.status(400).json({ success: true, message: "email already registered" })
   }
 }

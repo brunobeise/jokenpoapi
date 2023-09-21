@@ -57,6 +57,11 @@ export class AppController {
   }
 
   async sendEmail(req: Request, res: Response) {
+    const userRepository = new UserRepository()
+    const emails = await userRepository.getAllEmails()
+    if (emails.some((email) => email === req.body.email)) {
+      return res.status(400).json({ success: false, error: "Email already registered" })
+    }
 
     sendEmail(req.body.email, req.body.code)
       .then(r => res.status(200).json({

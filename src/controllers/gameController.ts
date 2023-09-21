@@ -30,7 +30,7 @@ export class GameController {
 
     const { playerHand, betValue } = req.body;
 
-    if (user.balance! < betValue || !playerHand || !betValue) {
+    if (user.balance! < betValue || !playerHand || !betValue || betValue < 0) {
       return res.sendStatus(400); // Bad Request
     }
 
