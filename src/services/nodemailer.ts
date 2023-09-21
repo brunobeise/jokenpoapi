@@ -60,7 +60,7 @@ export async function sendEmail(email: string, code: string | number) {
   }
 
   catch (error: any) {
-    throw new Error(error.message)
+    return error.message
   }
 
 

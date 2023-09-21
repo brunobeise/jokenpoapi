@@ -14,6 +14,7 @@ export default async function readyToPlay(id: string, betValue: number, socket: 
         return;
     }
 
+
     const queuedPlayer: QueuedPlayer = {
         socket,
         playerData

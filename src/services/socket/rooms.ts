@@ -10,13 +10,17 @@ const userRepository = new UserRepository()
 
 
 export function createRoom(player1: QueuedPlayer, player2: QueuedPlayer, initialBetValue: number, io: Server) {
-
-
     const roomID = uuid();
-    console.log("crete room " + roomID + "betvalue" + initialBetValue);
+    console.log("create room " + roomID + "betvalue" + initialBetValue);
     player1.socket.join(roomID);
     player2.socket.join(roomID);
     let betValue = initialBetValue;
+
+    if (player1.playerData.balance! < initialBetValue || player2.playerData.balance! < initialBetValue) {
+        betValue = Math.min(player1.playerData.balance!, player2.playerData.balance!);
+        console.log("Adjusted bet value based on player balances: " + betValue);
+    }
+
 
     const choices = { player1: null, player2: null };
 
@@ -104,11 +108,19 @@ export function createRoom(player1: QueuedPlayer, player2: QueuedPlayer, initial
     });
 
     player1.socket.on("approveBetChange", (newBetValue) => {
+        if (player1.playerData.balance! < newBetValue || player2.playerData.balance! < newBetValue) {
+            io.to(roomID).emit("betValueChangedAccepted", betValue);
+            return
+        }
         io.to(roomID).emit("betValueChangedAccepted", newBetValue);
         betValue = newBetValue
     });
 
     player2.socket.on("approveBetChange", (newBetValue) => {
+        if (player1.playerData.balance! < newBetValue || player2.playerData.balance! < newBetValue) {
+            io.to(roomID).emit("betValueChangedAccepted", betValue);
+            return
+        }
         io.to(roomID).emit("betValueChangedAccepted", newBetValue);
         betValue = newBetValue
     });
@@ -121,7 +133,7 @@ export function createRoom(player1: QueuedPlayer, player2: QueuedPlayer, initial
         io.to(roomID).emit("betValueChangedRejected", betValue);
     });
 
-    io.to(roomID).emit("gameStart", { player1: player1.playerData, player2: player2.playerData });
+    io.to(roomID).emit("gameStart", { player1: player1.playerData, player2: player2.playerData, betValue });
 }
 
 export async function findOpponent(io: Server, betValue: number) {
