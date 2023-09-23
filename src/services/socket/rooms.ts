@@ -60,6 +60,8 @@ export function createRoom(player1: QueuedPlayer, player2: QueuedPlayer, initial
 
                 userRepository.addMatch(player2.playerData.id, 0),
                     userRepository.addMatch(player1.playerData.id, 0)
+                newBalance1 = player1.playerData.balance
+                newBalance2 = player2.playerData.balance
 
             }
 
