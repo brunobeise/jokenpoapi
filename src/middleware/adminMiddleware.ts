@@ -7,7 +7,7 @@ export function adminMiddleware(
 ) {
   const admpass = req.headers.admpass;
   if (admpass !== process.env.ADMPASS) {
-    res.json({ message: "Unauthorized" });
+    res.status(401).send("Unauthorized");
     return;
   }
   next();

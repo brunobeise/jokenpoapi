@@ -74,4 +74,8 @@ export default class AuctionRepository {
         return await this.bidRepository.save(newBid);
     }
 
+    async delete(id: string) {
+        await this.auctionRepository.delete(id);
+    }
+
 }

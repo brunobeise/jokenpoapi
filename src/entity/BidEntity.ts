@@ -11,7 +11,9 @@ export class Bid {
     @JoinColumn()
     user!: User;
 
-    @ManyToOne(() => Auction, (auction) => auction.bids)
+    @ManyToOne(() => Auction, (auction) => auction.bids, {
+        onDelete: 'CASCADE'
+    })
     @JoinColumn()
     auction!: Auction;
 

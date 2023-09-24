@@ -25,7 +25,6 @@ export default class MarketplaceRepository {
         return await this.marketplaceRepository.save(newMarketplace);
     }
 
-    // Read (Find by ID)
     async findById(id: string) {
         return await this.marketplaceRepository.findOne({
             where: { id },
@@ -117,7 +116,6 @@ export default class MarketplaceRepository {
 
     }
 
-    // Delete
     async delete(id: string) {
         await this.marketplaceRepository.delete(id);
     }
