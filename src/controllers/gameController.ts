@@ -32,7 +32,7 @@ export class GameController {
 
 
     if (user.balance! < betValue || !playerHand || betValue === undefined || betValue < 0) {
-      return res.sendStatus(500); // Bad Request
+      return res.sendStatus(400); // Bad Request
     }
 
     const computerHand = (botBalance - betValue) < 0 ? sortWinResult(playerHand) : sortResult();
